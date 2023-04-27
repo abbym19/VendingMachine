@@ -1,0 +1,63 @@
+#include <LiquidCrystal_I2C.h>
+
+int nickel=4;
+int dime=5;
+int quarter=6;
+int amount=0;
+int valuestored=0;
+int itemcost=50;
+
+//LCD display
+LiquidCrystal_I2C lcd(0x27,16,2);
+
+void setup()
+{
+  pinMode(nickel, INPUT_PULLUP);
+  pinMode(dime, INPUT_PULLUP);
+  pinMode(quarter, INPUT_PULLUP);
+   Serial.begin(9600);
+}
+void loop()
+{
+ while(true)
+  {
+    amount = countcoins();
+    valuestored+=amount;
+    delay(10);
+
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Amount entered:");
+    lcd.setCursor(0,1);
+    lcd.print(valuestored);
+    lcd.setCursor(4,1);
+    lcd.print("cents");
+    delay(100);
+
+    if(valuestored>=itemcost)
+    {
+    break;
+    }
+  }
+}
+int countcoins()
+{
+while(true)
+  {
+    if(digitalRead(4)==LOW)
+    {
+      delay(100);
+      return 10;
+    }
+    if(digitalRead(5)==LOW)
+    {
+      delay(100);
+      return 5;
+    }
+    if(digitalRead(6)==LOW)
+    {
+      delay(100);
+      return 25;
+    }
+  }
+  }
