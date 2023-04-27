@@ -1,0 +1,36 @@
+#include <Servo.h>
+
+Servo s1;
+int val=0;
+
+void setup() {
+Serial.begin(9600);
+s1.attach(3);
+pinMode(2,INPUT);
+
+}
+
+void loop() {
+val = digitalRead(2);
+Serial.println(val);
+delay(1);
+
+if(val==1)
+{
+s1.writeMicroseconds(1480);
+delay(1000);
+}
+else
+{
+s1.writeMicroseconds(1000);
+delay(225);
+
+s1.writeMicroseconds(1480);
+delay(5000);
+
+
+s1.writeMicroseconds(2000);
+delay(180);
+}
+
+}
