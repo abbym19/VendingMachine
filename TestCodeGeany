@@ -1,0 +1,104 @@
+#include <iostream>
+
+using namespace std; 
+
+int countcoins(int);
+
+int main()
+{
+
+//output
+
+int buttonselected=0;
+int amount=0;
+int valuestored=0;
+int itemcost=0;
+  
+  cout <<"WELCOME SELECT\n";
+  cout <<"AN ITEM TO START";
+
+
+      cout << "\nSelect an item: ";
+
+
+	cin >> buttonselected;
+	
+      if (buttonselected ==1) {
+        itemcost=50;
+      } else if (buttonselected ==2) {
+        itemcost=50;
+      } else if (buttonselected ==3) {
+        itemcost=25;
+        
+      } else if (buttonselected ==4) {
+        itemcost=25;
+     
+      }
+     
+   
+
+
+    while(true)
+{  
+	
+      cout <<"\nEnter something\n";
+      amount = countcoins(itemcost);
+
+     valuestored+=amount;
+      cout << "Amount inserted: \n";
+
+      cout << valuestored;
+
+      cout << " cents";
+      
+    if(valuestored>=itemcost)
+    {
+      break;
+    }
+ }
+      
+
+          switch(buttonselected)
+          {
+            case 1:
+             cout << "\nPlease take item 1";
+            case 2:
+               cout << "\n\nPlease take item 2";
+              break;
+            case 3:
+               cout << "\n\nPlease take item 3";
+              break;
+            case 4:
+               cout << "\n\nPlease take item 4";
+              break;
+          }
+        buttonselected=0;
+        itemcost=0;
+     
+  }
+
+//function to count coins
+int countcoins(int itemcost)
+{
+	int coin=0;
+	int amount=0;
+	
+cout << "Enter a quarter, nickel, or dime: ";
+
+cin >> coin;
+
+if(coin==1)
+{
+	amount+=25;
+}
+else if(coin==2)
+{
+	amount+=10;
+}
+else if(coin==3)
+{
+	amount+=5;
+}
+return amount;
+
+}
