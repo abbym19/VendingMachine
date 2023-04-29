@@ -1,0 +1,243 @@
+#include <LiquidCrystal_I2C.h>
+#include <Servo.h>
+//input
+const int red=0;
+const int yellow=1;
+const int white=2;
+const int blue=3;
+int nickel=0;
+int dime=0;
+int quarter=0;
+
+//output
+
+const int IRdoor=7;
+const int servodoor=9;
+
+
+//LCD display
+LiquidCrystal_I2C lcd(0x27,16,2);
+
+//Servo motors
+Servo servo1, servo2, servo3, servo4, servo5;
+//states
+
+enum State{
+STATE0, STATE1, STATE2
+};
+
+State state = STATE0;
+
+int buttonselected=0;
+bool itemdispensed=false;
+int amount=0;
+int valuestored=0;
+int itemcost=0;
+int doorval=0;
+
+//setup
+void setup() {
+
+  //Welcome message
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0,0);
+  lcd.print("WELCOME SELECT");
+  lcd.setCursor(0,1);
+  lcd.print("AN ITEM TO START");
+  delay(2000);
+  lcd.clear();
+
+  //Red Button
+  pinMode(A0, OUTPUT);
+  pinMode(red, INPUT_PULLUP);
+
+  //Yellow Button
+  pinMode(A1, OUTPUT);
+  pinMode(yellow, INPUT_PULLUP);
+
+  //White Button
+  pinMode(A2, OUTPUT);
+  pinMode(white, INPUT_PULLUP);
+
+  //Blue Button Button
+  pinMode(A3, OUTPUT);
+  pinMode(blue, INPUT_PULLUP);
+
+  //IR coin detector sensors
+  pinMode(nickel, INPUT_PULLUP);
+  pinMode(dime, INPUT_PULLUP);
+  pinMode(quarter, INPUT_PULLUP);
+
+  //Servo motors
+  servo1.attach(10);
+  servo2.attach(11);
+  servo3.attach(12);
+  servo4.attach(13);
+
+  //door servo
+  servo5.attach(9);
+ 
+  //door IR sensor
+  pinMode(7,INPUT_PULLUP);
+
+  Serial.begin(9600);
+}
+
+//main function
+void loop() {
+
+switch(state)
+  {
+    case STATE0: //selecting an item
+      lcd.print("Select an item");
+
+      buttonselected = 0;
+      servo1.writeMicroseconds(1500);
+      servo2.writeMicroseconds(1500);
+      servo3.writeMicroseconds(1500);
+      servo4.writeMicroseconds(1500);
+      servo5.writeMicroseconds(1500);
+
+      if (digitalRead(red) == HIGH) {
+        buttonselected = 1;
+        itemcost=50;
+        state = STATE1;
+      } else if (digitalRead(yellow) == HIGH) {
+        buttonselected = 2;
+        itemcost=50;
+        state = STATE1;
+      } else if (digitalRead(white) == HIGH) {
+        buttonselected = 3;
+        itemcost=25;
+        state = STATE1;
+      } else if (digitalRead(blue) == HIGH) {
+        buttonselected = 4;
+        itemcost=25;
+        state = STATE1;
+      }
+      break;
+   
+    case STATE1: //inserting coins
+
+      servo1.writeMicroseconds(1500);
+      delay(100);
+      servo2.writeMicroseconds(1500);
+      delay(100);
+      servo3.writeMicroseconds(1500);
+      delay(100);
+      servo4.writeMicroseconds(1500);
+      delay(100);
+      servo5.writeMicroseconds(1500);
+      delay(100);
+
+      amount = countcoins();
+
+      lcd.setCursor(0,0);
+      lcd.print("Amount inserted:");
+
+      lcd.setCursor(0,1);
+      lcd.print(amount);
+
+      lcd.setCursor(4,1);
+      lcd.print("cents");
+
+      delay(2000);
+
+    if(amount>=itemcost)
+    {
+      if(amount>itemcost)
+      {
+        valuestored = amount - itemcost;
+        amount = itemcost;
+      }
+      state = STATE2;
+    }
+     
+      break;
+
+    case STATE2: //dispensing the item
+
+          switch(buttonselected)
+          {
+            case 1:
+              servo1.writeMicroseconds(2000); // rotate
+              delay(950);
+              servo1.writeMicroseconds(1500);  // stop
+              delay(500);
+              break;
+            case 2:
+              servo2.writeMicroseconds(2000); // rotate
+              delay(950);
+              servo2.writeMicroseconds(1500);  // stop
+              delay(500);
+              break;
+            case 3:
+              servo3.writeMicroseconds(2000); // rotate
+              delay(950);
+              servo3.writeMicroseconds(1500);  // stop
+              delay(500);
+              break;
+            case 4:
+              servo4.writeMicroseconds(2000); // rotate
+              delay(950);
+              servo4.writeMicroseconds(1500);  // stop
+              delay(500);
+              break;
+          }
+        buttonselected=0;
+        itemcost=0;
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("Please take your item");
+        dooropener();
+        delay(6000);
+
+      break;
+  }
+}
+//function to count coins
+int countcoins()
+{
+int dimeread = digitalRead(4);
+int nickelread = digitalRead(5);
+int quarterread = digitalRead(6);
+
+if(dimeread==0)
+{
+  dime++;
+}
+else if(nickelread==0)
+{
+  nickel++;
+}
+else if(quarterread==0)
+{
+  quarter++;
+}
+amount = 25*quarter + 10*dime + 5*nickel;
+return amount;
+
+}
+
+//door opener function
+void dooropener()
+{
+int val = digitalRead(7);
+Serial.println(val);
+delay(1);
+
+if(val==1)
+{
+servo5.writeMicroseconds(1480);
+delay(1000);
+}
+else
+{
+servo5.writeMicroseconds(1000);
+delay(500);
+
+servo5.writeMicroseconds(1480);
+delay(5000);
+}
+}
